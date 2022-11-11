@@ -1,12 +1,14 @@
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
-const { jwt_secret } = require('../config/keys.js')
+const { jwt_secret } = require('../config/keys')
 
 
 const UserController = {
   async create(req, res) {
     try {
-      const user = await User.create(req.body);
+      const password = await bcrypt.hash(req.body.password,10);
+      const user = await User.create({...req.body,password});
       res.status(201).send(user);
     } catch (error) {
       console.error(error);
@@ -24,7 +26,17 @@ const UserController = {
     
     email: req.body.email,
     
-    })
+    });
+
+    if (!user){
+     return res.status(400).send("Correo o contraseña incorrectos")
+
+    }
+
+    const isMatch = bcrypt.compare(req.body.password,user.password)
+    if(!isMatch){
+     return res.status(400).send("Correo o contraseña incorrectos");
+    }
     
     const token = jwt.sign({ _id: user._id }, jwt_secret);
     
@@ -34,7 +46,7 @@ const UserController = {
     
     await user.save();
     
-    res.send({ message: 'Bienvenid@ ' + user.name, token });
+    res.send({ message: 'Bienvenid@ ' + user.name, token,user });
     
     } catch (error) {
     
@@ -43,6 +55,32 @@ const UserController = {
     }
     
     },
+
+    async logout(req, res) {
+
+      try {
+      
+      await User.findByIdAndUpdate(req.user._id, {
+      
+      $pull: { tokens: req.headers.authorization },
+      
+      });
+      
+      res.send({ message: "Desconectado con éxito" });
+      
+      } catch (error) {
+      
+      console.error(error);
+      
+      res.status(500).send({
+      
+      message: "Hubo un problema al intentar desconectar al usuario",
+      
+      });
+      
+      }
+      
+      },
 
 };
 
