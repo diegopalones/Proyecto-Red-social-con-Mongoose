@@ -46,27 +46,17 @@ const PostController = {
 
   async delete(req, res) {
     try {
+      
       const post = await Post.findByIdAndDelete(req.params._id);
-      res.send({ post, message: "Publicación borrada de forma stisfactoria" });
+      res.send({ post, message: 'post eliminado' });
     } catch (error) {
       console.error(error);
       res.status(500).send({
-        message: "Hubo un problema al eliminar la publicación",
+        message: 'Hubo un problema al eliminar el post',
       });
     }
   },
 
-  async delete(req, res) {
-    try {
-      const post = await Post.deleteMany(req.params.username);
-      res.send({ post, message: "Publicaciones eliminadas" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({
-        message: "Hubo un problema al eliminar las publicaciones",
-      });
-    }
-  },
 
   async update(req, res) {
     try {
