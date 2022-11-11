@@ -47,7 +47,7 @@ const PostController = {
   async delete(req, res) {
     try {
       const post = await Post.findByIdAndDelete(req.params._id);
-      res.send({ post, message: "Publicación borrada" });
+      res.send({ post, message: "Publicación borrada de forma stisfactoria" });
     } catch (error) {
       console.error(error);
       res.status(500).send({
