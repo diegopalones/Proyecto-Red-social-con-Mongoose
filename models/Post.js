@@ -2,8 +2,21 @@ const mongoose = require("mongoose");
 
 const PostSchema = new mongoose.Schema(
   {
-    username: String,
-    body: String,
+    username: {
+
+      type: String,
+      
+      required: [true, "Por favor rellena tu nombre"],
+      
+      },
+      
+      body: {
+
+        type: String,
+        
+        required: [true, "Por favor, introduce tu post"],
+        
+        },
   },
   { timestamps: true }
 );

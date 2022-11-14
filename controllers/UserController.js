@@ -5,16 +5,17 @@ const { jwt_secret } = require('../config/keys')
 
 
 const UserController = {
-  async create(req, res) {
+  async create(req, res,next) {
     try {
+      if(req.body.password === undefined){
+        return res.status(500).send({msg:'Debes introducir una contraseña'})
+      }
       const password = await bcrypt.hash(req.body.password,10);
       const user = await User.create({...req.body,password});
       res.status(201).send(user);
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .send({ message: "Ha habido un problema al crear el usuario" });
+      next(error);
     }
   },
 
@@ -46,7 +47,7 @@ const UserController = {
     
     await user.save();
     
-    res.send({ message: 'Bienvenid@ ' + user.name, token,user });
+    res.send({ message: 'Bienvenid@ ' + user.username, token,user });
     
     } catch (error) {
     
