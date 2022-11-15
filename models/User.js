@@ -24,6 +24,8 @@ const UserSchema = new mongoose.Schema(
 
       required: [true, "Por favor rellena tu correo"],
     },
+    
+     role: String,
 
     tokens: [],
     postIds: [{ type: ObjectId, ref: "Post" }],

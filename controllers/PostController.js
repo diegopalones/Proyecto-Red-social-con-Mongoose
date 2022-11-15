@@ -12,6 +12,7 @@ const PostController = {
         $push: { postIds: post._id },
       });
       res.status(201).send(post);
+      res.send({ message: "Post creado correctamente" });
     } catch (error) {
       console.error(error);
       next(error);
@@ -26,6 +27,7 @@ const PostController = {
         .limit(limit)
         .skip((page - 1) * limit);
       res.send(posts);
+      res.send({ message: "Aquí tienes todos los posts publicados",post });
     } catch (error) {
       console.error(error);
     }
