@@ -86,10 +86,10 @@ const UserController = {
 
       async loggedIn(req, res) {
         try {
-          const user = await User.findById(req.user._id).populate({
-            path: "postIds", 
-          });
-          res.send(user);
+          console.log("users")
+          const user = await User.findById(req.user._id)
+          console.log("user",user)
+          res.send({msg:"user logged",user});
         } catch (error) {
           console.error(error);
           res.status(500).send({

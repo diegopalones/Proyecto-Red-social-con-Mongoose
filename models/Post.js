@@ -23,14 +23,11 @@ const PostSchema = new mongoose.Schema(
           type: ObjectId,
           ref: "User",
         },
-
-        comments: [
-          {
-            userId: { type: ObjectId, ref: "User" },
-            comment: String
-            
-          },
-        ],
+        comments: [{
+          userId: { type: ObjectId, ref: 'User' },
+          comment: String
+      }]
+  
   },
   { timestamps: true }
 );

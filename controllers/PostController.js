@@ -2,7 +2,6 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 
 const PostController = {
-  
   async create(req, res, next) {
     try {
       const post = await Post.create({
@@ -15,7 +14,7 @@ const PostController = {
       res.status(201).send(post);
     } catch (error) {
       console.error(error);
-      next(error)
+      next(error);
     }
   },
 
@@ -23,11 +22,9 @@ const PostController = {
     try {
       const { page = 1, limit = 10 } = req.query;
       const posts = await Post.find()
-      .populate("comments.userId")
-      .limit(limit)
-
-      .skip((page - 1) * limit);
-      
+        .populate("comments.userId")
+        .limit(limit)
+        .skip((page - 1) * limit);
       res.send(posts);
     } catch (error) {
       console.error(error);
@@ -49,7 +46,7 @@ const PostController = {
         return res.status(400).send("Busqueda demasiado larga");
       }
       const username = new RegExp(req.params.username, "i");
-      const post = await Post.find({ username });
+      const post = await Post.find({ username })
       res.send(post);
     } catch (error) {
       console.log(error);
@@ -58,17 +55,15 @@ const PostController = {
 
   async delete(req, res) {
     try {
-      
       const post = await Post.findByIdAndDelete(req.params._id);
-      res.send({ post, message: 'post eliminado' });
+      res.send({ post, message: "post eliminado" });
     } catch (error) {
       console.error(error);
       res.status(500).send({
-        message: 'Hubo un problema al eliminar el post',
+        message: "Hubo un problema al eliminar el post",
       });
     }
   },
-
 
   async update(req, res) {
     try {
@@ -92,7 +87,7 @@ const PostController = {
         },
         { new: true }
       );
-      res.send({msg:"Gracias por comentar",post});
+      res.send({ msg: "Gracias por comentar", post });
     } catch (error) {
       console.error(error);
       res.status(500).send({ msg: "No se ha podido comentar la publicación" });
