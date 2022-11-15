@@ -93,5 +93,34 @@ const PostController = {
       res.status(500).send({ msg: "No se ha podido comentar la publicación" });
     }
   },
+
+  async like(req, res) {
+    try {
+      const post = await Post.findByIdAndUpdate(
+        req.params._id,
+        { $push: { likes: req.user._id } },
+        { new: true }
+      );
+      res.send(post);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "No se ha podido dar el like" });
+    }
+  },
+
+  async dislike(req, res) {
+    try {
+      const post = await Post.findByIdAndUpdate(
+        req.params._id,
+        { $pull: { likes: req.user._id } },
+        { new: true }
+      );
+      res.send(post);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "No hemos podido quitar tu like" });
+    }
+  },
+
 };
 module.exports = PostController;
