@@ -4,11 +4,12 @@ const jwt = require('jsonwebtoken');
 const { jwt_secret } = require('../config/keys')
 
 
+
 const UserController = {
   async create(req, res,next) {
     try {
       if(req.body.password === undefined){
-        return res.status(500).send({msg:'Debes introducir una contraseña'})
+        res.status(500).send({msg:'Debes introducir una contraseña'})
       }
       const password = await bcrypt.hash(req.body.password,10);
       const user = await User.create({...req.body,password});
@@ -81,6 +82,21 @@ const UserController = {
       
       }
       
+      },
+
+      async loggedIn(req, res) {
+        try {
+          const user = await User.findById(req.user._id).populate({
+            path: "postIds", 
+          });
+          res.send(user);
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({
+            msg: "Ha habido un problema al consultar el usuario logeado",
+            error,
+          });
+        }
       },
 
 };

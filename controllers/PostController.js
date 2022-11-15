@@ -1,14 +1,21 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 const PostController = {
   
   async create(req, res, next) {
     try {
-      const post = await Post.create(req.body);
+      const post = await Post.create({
+        ...req.body,
+        userId: req.user._id,
+      });
+      await User.findByIdAndUpdate(req.user._id, {
+        $push: { postIds: post._id },
+      });
       res.status(201).send(post);
     } catch (error) {
       console.error(error);
-      next(error);
+      next(error)
     }
   },
 
@@ -16,6 +23,7 @@ const PostController = {
     try {
       const { page = 1, limit = 10 } = req.query;
       const posts = await Post.find()
+      .populate("comments.userId")
       .limit(limit)
 
       .skip((page - 1) * limit);
@@ -70,6 +78,24 @@ const PostController = {
       res.send({ message: "Publicación actualizada correctamente", post });
     } catch (error) {
       console.error(error);
+    }
+  },
+
+  async insertComment(req, res) {
+    try {
+      const post = await Post.findByIdAndUpdate(
+        req.params._id,
+        {
+          $push: {
+            comments: { comment: req.body.comment, userId: req.user._id },
+          },
+        },
+        { new: true }
+      );
+      res.send({msg:"Gracias por comentar",post});
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "No se ha podido comentar la publicación" });
     }
   },
 };

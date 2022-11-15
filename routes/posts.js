@@ -9,5 +9,6 @@ router.get("/id/:_id", PostController.getById);
 router.get("/name/:username", PostController.getPostsByUserName);
 router.delete('/id/:_id', authentication, PostController.delete);
 router.put("/id/:_id",authentication, PostController.update);
+router.put("/insertComment/:_id", authentication, PostController.insertComment);
 
 module.exports = router;
