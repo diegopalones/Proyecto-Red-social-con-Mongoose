@@ -2,8 +2,9 @@ const User = require('../models/User');
 const Post = require("../models/Post");
 
 const jwt = require('jsonwebtoken');
+require("dotenv").config();
 
-const { jwt_secret } = require('../config/keys.js')
+
 
 const authentication = async(req, res, next) => {
 
@@ -11,7 +12,7 @@ try {
 
 const token = req.headers.authorization;
 
-const payload = jwt.verify(token, jwt_secret);
+const payload = jwt.verify(token, process.env.JWT_SECRET);
 
 const user = await User.findOne({ _id: payload._id, tokens: token });
 
