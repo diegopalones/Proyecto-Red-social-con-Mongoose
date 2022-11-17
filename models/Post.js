@@ -4,32 +4,29 @@ const ObjectId = mongoose.SchemaTypes.ObjectId;
 const PostSchema = new mongoose.Schema(
   {
     title: {
-
       type: String,
-      
+
       required: [true, "Por favor, escribe un post"],
-      
+    },
+
+    body: {
+      type: String,
+
+      required: [true, "Por favor, tu post debe contener una descrpción"],
+    },
+
+    userId: {
+      type: ObjectId,
+      ref: "User",
+    },
+    comments: [
+      {
+        userId: { type: ObjectId, ref: "User" },
+        comment: String,
       },
-      
-      body: {
+    ],
 
-        type: String,
-        
-        required: [true, "Por favor, tu post debe contener una descrpción"],
-        
-        },
-
-        userId: {
-          type: ObjectId,
-          ref: "User",
-        },
-        comments: [{
-          userId: { type: ObjectId, ref: 'User' },
-          comment: String
-      }],
-
-      likes: [{ type: ObjectId }],
-  
+    likes: [{ type: ObjectId }],
   },
   { timestamps: true }
 );

@@ -27,7 +27,7 @@ const PostController = {
         .limit(limit)
         .skip((page - 1) * limit);
       res.send(posts);
-      res.send({ message: "Aquí tienes todos los posts publicados",post });
+      res.send({ message: "Aquí tienes todos los posts publicados", post });
     } catch (error) {
       console.error(error);
     }
@@ -48,7 +48,7 @@ const PostController = {
         return res.status(400).send("Busqueda demasiado larga");
       }
       const username = new RegExp(req.params.username, "i");
-      const post = await Post.find({ username })
+      const post = await Post.find({ username });
       res.send(post);
     } catch (error) {
       console.log(error);
@@ -123,6 +123,5 @@ const PostController = {
       res.status(500).send({ msg: "No hemos podido quitar tu like" });
     }
   },
-
 };
 module.exports = PostController;
