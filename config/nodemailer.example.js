@@ -12,7 +12,7 @@ auth: {
 
 user: 'tucorreo@gmail.com',
 
-pass: 'tu contraseña'
+pass: 'tu_contraseña'
 
 }
 
