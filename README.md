@@ -4,13 +4,14 @@ node + express, as well as MongoDB/mongoose.
 The project will consist of a social network.
 
 # what can you do at this project?
+
 Una vez analizadas las necesidades del proyecto, se espera
 que el alumno desarrolle una API REST que sea capaz de lo siguiente:
-● User registration using Bcrypt. 
-● User login + token + middleware.
-● Able to create a CRUD.
-● Give and remove Like in post.
-● Backend production available.
+- User registration using Bcrypt. 
+- User login + token + middleware.
+- Able to create a CRUD.
+- Give and remove Like in post.
+- Backend production available.
 
 ## Used tecnologies:
 
@@ -45,7 +46,7 @@ with the comand "npm install" to will be able to start.
 ![image](assets\code.png)
 
 ## Creating user with postman
-![image](assets\Create User.png)
+![image](assets\Create_User.png)
 
 ## Using mongoDB Cloud to check all the endpoints and datebase created
 ![image](assets\mongo_db.png)
