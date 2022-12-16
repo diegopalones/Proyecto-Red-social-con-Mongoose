@@ -52,7 +52,7 @@ with the comand "npm install" to will be able to start.
 ![image](assets\mongo_db.png)
 
 ## Full project deployed at Vercel
-![image](assets\Vercel.png)
+![image](/assets/Vercel.png)
 
 
 
