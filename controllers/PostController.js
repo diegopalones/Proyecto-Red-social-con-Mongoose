@@ -12,7 +12,7 @@ const PostController = {
         $push: { postIds: post._id },
       });
       res.status(201).send(post);
-      res.send({ message: "Post creado correctamente" });
+      res.send({ msg: "Post creado correctamente", post });
     } catch (error) {
       console.error(error);
       next(error);
@@ -23,11 +23,12 @@ const PostController = {
     try {
       const { page = 1, limit = 200 } = req.query;
       const posts = await Post.find()
+        .populate("userId")
         .populate("comments.userId")
-        .limit(limit)
+        .limit(limit*1)
         .skip((page - 1) * limit);
       res.send(posts);
-      res.send({ message: "Aquí tienes todos los posts publicados", post });
+      res.send({ msg: "Aquí tienes todos los posts publicados", post });
     } catch (error) {
       console.error(error);
     }
@@ -36,9 +37,23 @@ const PostController = {
   async getById(req, res) {
     try {
       const post = await Post.findById(req.params._id);
-      res.send(post);
+      res.send({msg:"Aquí tienes el post por ID que has solicitado",post});
     } catch (error) {
       console.error(error);
+    }
+  },
+
+  async getPostsByName(req, res) {
+    try {
+      if (req.params.title.length > 20) {
+        return res.status(400).send("Search too long");
+      }
+      const title = new RegExp(req.params.title, "i");
+      const post = await Post.find({ title });
+      res.send(post);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
     }
   },
 
@@ -58,7 +73,7 @@ const PostController = {
   async delete(req, res) {
     try {
       const post = await Post.findByIdAndDelete(req.params._id);
-      res.send({ post, message: "post eliminado" });
+      res.send({ post, message: "post eliminado", post });
     } catch (error) {
       console.error(error);
       res.status(500).send({
@@ -69,10 +84,11 @@ const PostController = {
 
   async update(req, res) {
     try {
+      if (req.file) req.body.image_path = req.file.filename;
       const post = await Post.findByIdAndUpdate(req.params._id, req.body, {
         new: true,
       });
-      res.send({ message: "Publicación actualizada correctamente", post });
+      res.send({ message: "Post successfully updated", post });
     } catch (error) {
       console.error(error);
     }
@@ -82,31 +98,40 @@ const PostController = {
     try {
       const post = await Post.findByIdAndUpdate(
         req.params._id,
-        {
-          $push: {
-            comments: { comment: req.body.comment, userId: req.user._id },
-          },
-        },
-        { new: true }
-      );
-      res.send({ msg: "Gracias por comentar", post });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({ msg: "No se ha podido comentar la publicación" });
-    }
-  },
-
-  async like(req, res) {
-    try {
-      const post = await Post.findByIdAndUpdate(
-        req.params._id,
-        { $push: { likes: req.user._id } },
+        { $push: { comments: { ...req.body, userId: req.user._id } } },
         { new: true }
       );
       res.send(post);
     } catch (error) {
       console.error(error);
-      res.status(500).send({ msg: "No se ha podido dar el like" });
+      res
+        .status(500)
+        .send({ message: "There was a problem with your comment" });
+    }
+  },
+
+  async like(req, res) {
+    try {
+      const existPost = await Post.findById(req.params._id);
+      if (!existPost.likes.includes(req.user._id)) {
+        const post = await Post.findByIdAndUpdate(
+          req.params._id,
+          { $push: { likes: req.user._id } },
+          { new: true }
+        );
+
+        await User.findByIdAndUpdate(
+          req.user._id,
+          { $push: { favourites: req.params._id } },
+          { new: true }
+        );
+        res.send(post);
+      } else {
+        res.status(400).send({ msg: "¡Ya has dado like a este post!" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "Hubo un problema con tu like." });
     }
   },
 
@@ -115,6 +140,11 @@ const PostController = {
       const post = await Post.findByIdAndUpdate(
         req.params._id,
         { $pull: { likes: req.user._id } },
+        { new: true }
+      );
+      await User.findByIdAndUpdate(
+        req.user._id,
+        { $pull: { favourites: req.params._id } },
         { new: true }
       );
       res.send(post);

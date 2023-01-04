@@ -27,6 +27,7 @@ const PostSchema = new mongoose.Schema(
     ],
 
     likes: [{ type: ObjectId }],
+    image_path: { type: String }
   },
   { timestamps: true }
 );

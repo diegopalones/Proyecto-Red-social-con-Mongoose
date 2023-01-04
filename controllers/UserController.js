@@ -58,7 +58,7 @@ const UserController = {
         { confirmed: true }
       );
 
-      res.status(201).send("Usuario confirmado");
+      res.status(201).send({msg:"Usuario confirmado"});
     } catch (error) {
       console.error(error);
     }
@@ -71,16 +71,17 @@ const UserController = {
       });
 
       if (!user) {
-        return res.status(400).send("Correo o contraseña incorrectos");
+        return res.status(400).send({msg:"Correo o contraseña incorrectos"});
       }
 
       if (!user.confirmed) {
-        return res.status(400).send({ message: "Debes confirmar tu correo" });
+        return res.status(400).send({ msg: "Debes confirmar tu correo" });
       }
 
-      const isMatch = bcrypt.compare(req.body.password, user.password);
+      const isMatch = await bcrypt.compare(req.body.password, user.password);
+   
       if (!isMatch) {
-        return res.status(400).send("Correo o contraseña incorrectos");
+        return res.status(400).send({msg:"Correo o contraseña incorrectos"});
       }
 
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
@@ -91,7 +92,7 @@ const UserController = {
 
       await user.save();
 
-      res.send({ message: "Bienvenid@ " + user.username, token, user });
+      res.send({ msg: "Bienvenid@ " + user.username, token, user });
     } catch (error) {
       console.error(error);
     }
@@ -103,28 +104,76 @@ const UserController = {
         $pull: { tokens: req.headers.authorization },
       });
 
-      res.send({ message: "Desconectado con éxito" });
+      res.send({ msg: "Desconectado con éxito" });
     } catch (error) {
       console.error(error);
 
       res.status(500).send({
-        message: "Hubo un problema al intentar desconectar al usuario",
+        msg: "Hubo un problema al intentar desconectar al usuario",
       });
     }
   },
 
-  async loggedIn(req, res) {
+  async getInfo(req, res) {
     try {
-      console.log("users");
-      const user = await User.findById(req.user._id);
-      console.log("user", user);
-      res.send({ msg: "user logged", user });
+      const user = await User.findById(req.user._id)
+        .populate({
+          path: "postIds",
+
+          populate: {
+            path: "comments.userId",
+          },
+        })
+        .populate("followers", "username")
+        .populate("following", "username");
+      res.send({message: "information", user});
     } catch (error) {
       console.error(error);
       res.status(500).send({
-        msg: "Ha habido un problema al consultar el usuario logueado",
-        error,
+        message: "There was a problem",
       });
+    }
+  },
+  async follow(req, res) {
+    try {
+      const existUser = await User.findById(req.params._id); // get id from params
+      if (!existUser.followers.includes(req.user._id)) {
+        // if the id of user is not already in followers
+        const user = await User.findByIdAndUpdate(
+          req.params._id,
+          { $push: { followers: req.user._id } }, //push user on to following list
+          { new: true } // update and show updat
+        );
+        await User.findByIdAndUpdate(
+          req.user._id,
+          { $push: { following: req.params._id } }, //push user on to following list
+          { new: true } // update and show updat
+        );
+        res.send(user);
+      } else {
+        res.status(400).send({ message: "You already follow this person!" });
+      }
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .send({ message: "There was a problem with following this person." });
+    }
+  },
+  async unFollow(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params._id,
+        { $pull: { followers: req.user._id } },
+        { new: true }
+      );
+      res.send(user);
+    } catch (error) {
+      console.error(error);
+
+      res
+        .status(500)
+        .send({ message: "There was a problem with your unfollow" });
     }
   },
 };

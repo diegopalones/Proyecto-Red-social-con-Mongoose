@@ -20,9 +20,9 @@ const typeError = (err, req, res, next) => {
   if (err.name === "ValidationError")
     return (err = handleValidationError(err, res));
   else if (err.code === 11000) {
-    res.status(400).send("El correo tiene que ser único");
+    res.status(400).send({msg:"El correo tiene que ser único"});
   } else {
-    res.status(500).send(`Hubo un problema`);
+    res.status(500).send({msg:`Hubo un problema`});
   }
 };
 

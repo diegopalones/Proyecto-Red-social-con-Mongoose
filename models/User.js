@@ -25,17 +25,18 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Por favor rellena tu correo"],
     },
 
-    // role: {
-    //   type: String,
-    //   required: true
-    // },
-
     confirmed: {
       type: Boolean,
     },
 
     tokens: [],
+    role: String,
     postIds: [{ type: ObjectId, ref: "Post" }],
+    favourites: [{ type: ObjectId, ref: "Post" }],
+    followers: [{ type: ObjectId, ref: "User" }],
+    following: [{ type: ObjectId, ref: "User" }],
+    image_path: { type: String }
+
   },
 
   { timestamps: true }
